@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Mistakes - JEE Mistake Tracker{% endblock %}
+{% block content %}
+<h1 class="page-title">Mistakes</h1>
+
+<form method="get" action="{{ url_for('list_mistakes') }}" class="filters">
+  <div class="form-group">
+    <label for="filter-subject">Subject</label>
+    <select class="select" id="filter-subject" name="subject">
+      <option value="">All subjects</option>
+      {% for s in subjects %}
+        <option value="{{ s }}" {% if filters.subject == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="filter-chapter">Chapter</label>
+    <select class="select" id="filter-chapter" name="chapter">
+      <option value="">All chapters</option>
+      {# Show chapters for selected subject, or all if none #}
+      {% if filters.subject and chapters[filters.subject] %}
+        {% for ch in chapters[filters.subject] %}
+          <option value="{{ ch }}" {% if filters.chapter == ch %}selected{% endif %}>{{ ch }}</option>
+        {% endfor %}
+      {% else %}
+        {% for s in subjects %}
+          {% for ch in chapters[s] %}
+            <option value="{{ ch }}" {% if filters.chapter == ch %}selected{% endif %}>{{ ch }}</option>
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="filter-error">Error type</label>
+    <select class="select" id="filter-error" name="error_type">
+      <option value="">All error types</option>
+      {% for e in error_types %}
+        <option value="{{ e }}" {% if filters.error_type == e %}selected{% endif %}>{{ e }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="filter-test">Test name</label>
+    <select class="select" id="filter-test" name="test_name">
+      <option value="">All tests</option>
+      {% for t in test_names %}
+        <option value="{{ t }}" {% if filters.test_name == t %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <a href="{{ url_for('list_mistakes') }}" class="btn btn-secondary" style="margin-left:6px;">Clear</a>
+  </div>
+</form>
+
+<div class="flex-between mb-16">
+  <div class="text-secondary">Showing {{ mistakes|length }} of {{ total }} results</div>
+  <a href="{{ url_for('export_csv', subject=filters.subject, chapter=filters.chapter, error_type=filters.error_type, test_name=filters.test_name) }}" class="btn btn-secondary btn-sm">Export CSV</a>
+</div>
+
+{% if mistakes %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Test</th>
+        <th>Subject</th>
+        <th>Chapter</th>
+        <th>Error type</th>
+        <th>Ref</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in mistakes %}
+      <tr>
+        <td class="mono">{{ m.test_date }}</td>
+        <td>{{ m.test_name }}</td>
+        <td>{{ m.subject }}</td>
+        <td>{{ m.chapter }}</td>
+        <td>{{ m.error_type }}</td>
+        <td>{{ m.question_ref or '' }}</td>
+        <td>{{ m.note or '' }}</td>
+        <td style="white-space: nowrap;">
+          <a href="{{ url_for('edit_mistake', mid=m.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+          <button type="button" class="btn btn-secondary btn-sm delete-toggle" data-id="{{ m.id }}">Delete</button>
+          <div id="delete-confirm-{{ m.id }}" class="delete-confirm">
+            <span>Delete this entry?</span>
+            <form method="post" action="{{ url_for('delete_mistake_route', mid=m.id) }}" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button type="submit" class="btn btn-primary btn-sm">Confirm</button>
+            </form>
+            <button type="button" class="btn btn-secondary btn-sm cancel-delete" data-id="{{ m.id }}">Cancel</button>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if has_more %}
+<div class="pagination">
+  <a href="{{ url_for('list_mistakes', subject=filters.subject, chapter=filters.chapter, error_type=filters.error_type, test_name=filters.test_name, page=next_page) }}" class="btn btn-secondary">Load more</a>
+</div>
+{% endif %}
+
+{% else %}
+<p class="empty-state">No mistakes found for the selected filters.</p>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.delete-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-id');
+      var el = document.getElementById('delete-confirm-' + id);
+      if (el) el.classList.add('open');
+    });
+  });
+  document.querySelectorAll('.cancel-delete').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-id');
+      var el = document.getElementById('delete-confirm-' + id);
+      if (el) el.classList.remove('open');
+    });
+  });
+});
+</script>
+{% endblock %}

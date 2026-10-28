@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - JEE Mistake Tracker{% endblock %}
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+
+<div class="flex-between mb-16">
+  <div class="text-secondary">Overview of mistakes in the selected period</div>
+  <form method="get" action="{{ url_for('dashboard') }}">
+    <select class="select" name="range" onchange="this.form.submit()" style="width:auto;">
+      <option value="14" {% if range_param == '14' %}selected{% endif %}>Last 14 days</option>
+      <option value="30" {% if range_param == '30' %}selected{% endif %}>Last 30 days</option>
+      <option value="90" {% if range_param == '90' %}selected{% endif %}>Last 90 days</option>
+      <option value="all" {% if range_param == 'all' %}selected{% endif %}>All time</option>
+    </select>
+  </form>
+</div>
+
+<div class="summary-row">
+  <div class="summary-card">
+    <div class="label">Total mistakes</div>
+    <div class="value">{{ total }}</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Most error-prone subject</div>
+    <div class="value">{{ most_subject if most_subject else '—' }}</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Most common error type</div>
+    <div class="value">{{ most_error if most_error else '—' }}</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Mistakes by subject</h3>
+    <div class="chart-wrap"><canvas id="chart-subject"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Mistakes by error type</h3>
+    <div class="chart-wrap"><canvas id="chart-error"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Top 5 weakest chapters</h3>
+    <div class="chart-wrap"><canvas id="chart-chapters"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Mistakes per test over time</h3>
+    <div class="chart-wrap"><canvas id="chart-tests"></canvas></div>
+  </div>
+</div>
+
+<!-- Data for charts -->
+<script id="dashboard-data" type="application/json">{{ {
+  'by_subject': by_subject,
+  'by_error': by_error,
+  'top_chapters': top_chapters,
+  'per_test': per_test
+} | tojson }}</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}
