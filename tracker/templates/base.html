@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}JEE Mistake Tracker{% endblock %}</title>
+  <script>
+    // Apply theme before first paint to avoid flash
+    (function() {
+      var stored = localStorage.getItem('theme');
+      var theme = stored;
+      if (!theme) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          theme = 'dark';
+        } else {
+          theme = 'light';
+        }
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <!-- Mobile top bar -->
+  <div class="topbar">
+    <div class="sidebar-title">JEE Mistake Tracker</div>
+    <div class="topbar-nav">
+      <a href="{{ url_for('add_mistake') }}" class="{% if request.endpoint == 'add_mistake' %}active{% endif %}">Add</a>
+      <a href="{{ url_for('list_mistakes') }}" class="{% if request.endpoint == 'list_mistakes' %}active{% endif %}">Mistakes</a>
+      <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="{{ url_for('revision') }}" class="{% if request.endpoint == 'revision' %}active{% endif %}">Revision</a>
+      <button id="theme-toggle-mobile" class="btn btn-secondary btn-sm" type="button">Dark mode</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">JEE Mistake Tracker</div>
+      <nav class="nav">
+        <a href="{{ url_for('add_mistake') }}" class="{% if request.endpoint == 'add_mistake' %}active{% endif %}">Add</a>
+        <a href="{{ url_for('list_mistakes') }}" class="{% if request.endpoint == 'list_mistakes' %}active{% endif %}">Mistakes</a>
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('revision') }}" class="{% if request.endpoint == 'revision' %}active{% endif %}">Revision</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="theme-toggle" class="theme-toggle" type="button">Dark mode</button>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="content">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

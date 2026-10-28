@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Revision - JEE Mistake Tracker{% endblock %}
+{% block content %}
+<h1 class="page-title">Revision list</h1>
+
+<div class="flex-between mb-16">
+  <div class="text-secondary">Top chapters by mistakes in the selected window</div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <form method="get" action="{{ url_for('revision') }}">
+      <select class="select" name="window" onchange="this.form.submit()" style="width:auto;">
+        <option value="14" {% if window == '14' %}selected{% endif %}>Last 14 days</option>
+        <option value="28" {% if window == '28' %}selected{% endif %}>Last 28 days</option>
+        <option value="60" {% if window == '60' %}selected{% endif %}>Last 60 days</option>
+      </select>
+    </form>
+    <button id="copy-btn" class="btn btn-secondary btn-sm" type="button">Copy as text</button>
+  </div>
+</div>
+
+{% if ranking %}
+  <div id="revision-list">
+    {% for item in ranking %}
+      <div class="revision-item">
+        <div class="revision-header">
+          <div class="revision-main">
+            <div class="revision-chapter">{{ loop.index }}. {{ item.chapter }}</div>
+            <div class="revision-meta">{{ item.subject }} · {{ item.count }} mistakes · most common: {{ item.most_common_error_type }}</div>
+          </div>
+          <div class="revision-count">{{ item.count }}</div>
+          {% if item.notes %}
+            <button class="expand-btn" type="button" data-target="notes-{{ loop.index }}">Show notes</button>
+          {% endif %}
+        </div>
+        {% if item.notes %}
+        <div id="notes-{{ loop.index }}" class="notes-list">
+          {% for n in item.notes %}
+            <div class="note-item">
+              {{ n.note }}
+              <div class="note-meta">{{ n.test_name }} {{ n.test_date }} {{ n.question_ref or '' }} · {{ n.error_type }}</div>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state">No mistakes logged in this period.</p>
+{% endif %}
+
+<script id="revision-data" type="application/json">{{ ranking | tojson }}</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.expand-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = btn.getAttribute('data-target');
+      var el = document.getElementById(target);
+      if (el) {
+        el.classList.toggle('open');
+        btn.textContent = el.classList.contains('open') ? 'Hide notes' : 'Show notes';
+      }
+    });
+  });
+  var copyBtn = document.getElementById('copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function(){
+      var dataEl = document.getElementById('revision-data');
+      var ranking = [];
+      try { ranking = JSON.parse(dataEl.textContent); } catch(e) { ranking = []; }
+      if (!ranking.length) {
+        copyBtn.textContent = 'Nothing to copy';
+        setTimeout(function(){ copyBtn.textContent='Copy as text';}, 1500);
+        return;
+      }
+      var lines = [];
+      ranking.forEach(function(item, idx){
+        lines.push((idx+1) + ". " + item.chapter + " (" + item.subject + ") - " + item.count + " mistakes, most common: " + item.most_common_error_type);
+        if (item.notes) {
+          item.notes.forEach(function(n){
+            lines.push("   - " + (n.note || "") + " (" + n.test_name + " " + n.test_date + " " + (n.question_ref || "") + ")");
+          });
+        }
+      });
+      var full = lines.join("\n");
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(full).then(function(){
+          copyBtn.textContent='Copied';
+          setTimeout(function(){ copyBtn.textContent='Copy as text';}, 1500);
+        });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = full;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        copyBtn.textContent='Copied';
+        setTimeout(function(){ copyBtn.textContent='Copy as text';}, 1500);
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Add mistake - JEE Mistake Tracker{% endblock %}
+{% block content %}
+<h1 class="page-title">Add mistake</h1>
+
+{% if message %}
+  <div class="confirmation">{{ message }}</div>
+{% endif %}
+
+<form id="mistake-form" method="post" action="{{ url_for('add_mistake') }}" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="form-group">
+    <label for="test_name">Test name</label>
+    <input class="input" type="text" id="test_name" name="test_name" value="{{ form_data.test_name }}" required>
+    {% if errors.test_name %}<div class="error-text" id="error-test_name">{{ errors.test_name }}</div>{% endif %}
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="test_date">Test date</label>
+      <input class="input" type="date" id="test_date" name="test_date" value="{{ form_data.test_date }}" required>
+      {% if errors.test_date %}<div class="error-text">{{ errors.test_date }}</div>{% endif %}
+    </div>
+    <div class="form-group">
+      <label for="subject">Subject</label>
+      <select class="select" id="subject" name="subject" required>
+        <option value="">Select subject</option>
+        {% for s in subjects %}
+          <option value="{{ s }}" {% if form_data.subject == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.subject %}<div class="error-text">{{ errors.subject }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="chapter">Chapter</label>
+      <select class="select" id="chapter" name="chapter" required data-current="{{ form_data.chapter }}">
+        <option value="">Select chapter</option>
+      </select>
+      {% if errors.chapter %}<div class="error-text">{{ errors.chapter }}</div>{% endif %}
+    </div>
+    <div class="form-group">
+      <label for="error_type">Error type</label>
+      <select class="select" id="error_type" name="error_type" required>
+        <option value="">Select error type</option>
+        {% for e in error_types %}
+          <option value="{{ e }}" {% if form_data.error_type == e %}selected{% endif %}>{{ e }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.error_type %}<div class="error-text">{{ errors.error_type }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="question_ref">Question reference <span class="help-text">(optional)</span></label>
+      <input class="input" type="text" id="question_ref" name="question_ref" value="{{ form_data.question_ref }}">
+    </div>
+    <div class="form-group">
+      <label for="note">Note <span class="help-text">(optional, max 300)</span></label>
+      <textarea class="textarea" id="note" name="note" maxlength="300" rows="2">{{ form_data.note }}</textarea>
+      {% if errors.note %}<div class="error-text" id="error-note">{{ errors.note }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="mt-16">
+    <button type="submit" class="btn btn-primary">Save mistake</button>
+  </div>
+</form>
+
+<!-- Chapters data for JS -->
+<script id="chapters-data" type="application/json">{{ chapters | tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock %}
