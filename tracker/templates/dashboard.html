@@ -30,22 +30,41 @@
   </div>
 </div>
 
-<div class="charts-grid">
-  <div class="chart-card">
+<div class="charts-stack">
+  <div class="chart-card" id="chart-card-subject" tabindex="0" role="button" aria-label="Expand chart: Mistakes by subject" data-chart="subject" data-title="Mistakes by subject">
     <h3>Mistakes by subject</h3>
     <div class="chart-wrap"><canvas id="chart-subject"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card" id="chart-card-error" tabindex="0" role="button" aria-label="Expand chart: Mistakes by error type" data-chart="error" data-title="Mistakes by error type">
     <h3>Mistakes by error type</h3>
     <div class="chart-wrap"><canvas id="chart-error"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card" id="chart-card-chapters" tabindex="0" role="button" aria-label="Expand chart: Top 5 weakest chapters" data-chart="chapters" data-title="Top 5 weakest chapters">
     <h3>Top 5 weakest chapters</h3>
     <div class="chart-wrap"><canvas id="chart-chapters"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card" id="chart-card-tests" tabindex="0" role="button" aria-label="Expand chart: Mistakes per test over time" data-chart="tests" data-title="Mistakes per test over time">
     <h3>Mistakes per test over time</h3>
     <div class="chart-wrap"><canvas id="chart-tests"></canvas></div>
+  </div>
+</div>
+
+<!-- Modal for expanded chart -->
+<div id="chart-modal-backdrop" class="chart-modal-backdrop" aria-hidden="true">
+  <div class="chart-modal" role="dialog" aria-modal="true" aria-labelledby="chart-modal-title">
+    <div class="chart-modal__header">
+      <h2 id="chart-modal-title" class="chart-modal__title"></h2>
+      <div class="chart-modal__toolbar">
+        <span class="chart-modal__hint">Scroll to zoom. Drag to pan. Double-click to reset.</span>
+        <button id="chart-modal-reset" class="btn btn-secondary btn-sm" type="button">Reset zoom</button>
+        <button id="chart-modal-close" class="btn btn-primary btn-sm" type="button">Close</button>
+      </div>
+    </div>
+    <div class="chart-modal__body">
+      <div class="chart-modal__canvas-wrap">
+        <canvas id="chart-modal-canvas"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -61,5 +80,7 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='vendor/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/hammer.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/chartjs-plugin-zoom.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 {% endblock %}
