@@ -98,27 +98,98 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 10px;
+
+/* Theme switch - pill-shaped track with sliding knob */
+.theme-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 120ms, color 120ms;
-}
-.theme-toggle:hover {
   background: var(--bg-hover);
-  color: var(--text);
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 120ms, border-color 120ms;
 }
-.theme-toggle:focus-visible {
+.theme-switch:focus-visible {
   outline: 2px solid var(--text-secondary);
   outline-offset: 2px;
+}
+
+/* Track icons - sun left, moon right, always in secondary */
+.theme-switch__track-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.theme-switch__track-icon--sun { left: 6px; }
+.theme-switch__track-icon--moon { right: 6px; }
+.theme-switch__track-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Knob that slides */
+.theme-switch__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms ease;
+}
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch__knob {
+    transition: none;
+  }
+}
+/* Drive knob position purely from [data-theme] so it is correct before first paint */
+[data-theme="light"] .theme-switch__knob {
+  transform: translateX(0);
+}
+[data-theme="dark"] .theme-switch__knob {
+  transform: translateX(28px);
+}
+.theme-switch__knob svg {
+  width: 14px;
+  height: 14px;
+}
+/* Knob icons - only active one visible */
+.theme-switch__knob-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+}
+.theme-switch__knob-icon--sun,
+.theme-switch__knob-icon--moon {
+  opacity: 0;
+}
+[data-theme="light"] .theme-switch__knob-icon--sun {
+  opacity: 1;
+}
+[data-theme="dark"] .theme-switch__knob-icon--moon {
+  opacity: 1;
 }
 
 /* Main content */
@@ -332,17 +403,17 @@ tbody tr:last-child td { border-bottom: none; }
   color: var(--text);
 }
 
-/* Charts grid */
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* Charts - stacked single column, larger readable */
+.charts-stack {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   margin-top: 16px;
 }
 .chart-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 24px;
   background: var(--bg);
 }
 .chart-card h3 {
@@ -354,9 +425,83 @@ tbody tr:last-child td { border-bottom: none; }
 .chart-wrap {
   position: relative;
   width: 100%;
-  height: 220px;
+  min-height: 340px;
 }
-.chart-wrap.tall { height: 260px; }
+/* Legacy class for backwards compat, but height now controlled via inline style or min-height */
+.chart-wrap.tall { min-height: 340px; }
+
+/* Clickable chart container for expand */
+.chart-card:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
+}
+.chart-card[role="button"] {
+  cursor: pointer;
+}
+.chart-card[role="button"]:hover {
+  background: var(--bg);
+}
+
+/* Modal for expanded chart */
+.chart-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.chart-modal-backdrop.open {
+  display: flex;
+}
+.chart-modal {
+  width: 90vw;
+  height: 85vh;
+  max-width: 1200px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chart-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.chart-modal__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+.chart-modal__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chart-modal__hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+.chart-modal__body {
+  flex: 1;
+  padding: 20px;
+  min-height: 0;
+  position: relative;
+}
+.chart-modal__canvas-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
 
 /* Revision */
 .revision-item {
@@ -436,7 +581,9 @@ tbody tr:last-child td { border-bottom: none; }
   .content { padding: 20px; }
   .form-row { grid-template-columns: 1fr; }
   .summary-row { grid-template-columns: 1fr; }
-  .charts-grid { grid-template-columns: 1fr; }
+  .chart-wrap { min-height: 280px; }
+  .chart-modal { width: 95vw; height: 85vh; }
+  .chart-modal__header { flex-wrap: wrap; gap: 8px; }
   .filters { flex-direction: column; align-items: stretch; }
 }
 

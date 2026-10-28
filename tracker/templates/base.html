@@ -31,7 +31,35 @@
       <a href="{{ url_for('list_mistakes') }}" class="{% if request.endpoint == 'list_mistakes' %}active{% endif %}">Mistakes</a>
       <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
       <a href="{{ url_for('revision') }}" class="{% if request.endpoint == 'revision' %}active{% endif %}">Revision</a>
-      <button id="theme-toggle-mobile" class="btn btn-secondary btn-sm" type="button">Dark mode</button>
+      <!-- Theme switch for narrow screens -->
+      <button id="theme-toggle-mobile" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark mode">
+        <!-- Track icons (secondary) -->
+        <span class="theme-switch__track-icon theme-switch__track-icon--sun" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="8" r="2.8"></circle>
+            <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.2 3.2l1 1M11.8 11.8l1 1M3.2 12.8l1-1M11.8 4.2l1-1"></path>
+          </svg>
+        </span>
+        <span class="theme-switch__track-icon theme-switch__track-icon--moon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 8A6 6 0 1 1 8 2a4 4 0 1 0 5 6z"></path>
+          </svg>
+        </span>
+        <!-- Sliding knob with active icon -->
+        <span class="theme-switch__knob" aria-hidden="true">
+          <span class="theme-switch__knob-icon theme-switch__knob-icon--sun">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="8" r="2.8"></circle>
+              <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.2 3.2l1 1M11.8 11.8l1 1M3.2 12.8l1-1M11.8 4.2l1-1"></path>
+            </svg>
+          </span>
+          <span class="theme-switch__knob-icon theme-switch__knob-icon--moon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 8A6 6 0 1 1 8 2a4 4 0 1 0 5 6z"></path>
+            </svg>
+          </span>
+        </span>
+      </button>
     </div>
   </div>
 
@@ -45,7 +73,32 @@
         <a href="{{ url_for('revision') }}" class="{% if request.endpoint == 'revision' %}active{% endif %}">Revision</a>
       </nav>
       <div class="sidebar-footer">
-        <button id="theme-toggle" class="theme-toggle" type="button">Dark mode</button>
+        <button id="theme-toggle" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark mode">
+          <span class="theme-switch__track-icon theme-switch__track-icon--sun" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="8" r="2.8"></circle>
+              <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.2 3.2l1 1M11.8 11.8l1 1M3.2 12.8l1-1M11.8 4.2l1-1"></path>
+            </svg>
+          </span>
+          <span class="theme-switch__track-icon theme-switch__track-icon--moon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 8A6 6 0 1 1 8 2a4 4 0 1 0 5 6z"></path>
+            </svg>
+          </span>
+          <span class="theme-switch__knob" aria-hidden="true">
+            <span class="theme-switch__knob-icon theme-switch__knob-icon--sun">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="8" r="2.8"></circle>
+                <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.2 3.2l1 1M11.8 11.8l1 1M3.2 12.8l1-1M11.8 4.2l1-1"></path>
+              </svg>
+            </span>
+            <span class="theme-switch__knob-icon theme-switch__knob-icon--moon">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 8A6 6 0 1 1 8 2a4 4 0 1 0 5 6z"></path>
+              </svg>
+            </span>
+          </span>
+        </button>
       </div>
     </aside>
     <main class="main">
